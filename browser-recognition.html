@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Vibracelet Speech Recognition</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Vibracelet Speech Recognition</h1>
+    </header>
+    <main>
+      <button id="button">Start listening</button>
+      <div id="result"></div>
+      <p id="message" hidden aria-hidden="true">
+        Your browser doesn't support Speech Recognition. Use Google Chrome.
+      </p>
+      
+    </main>
+    <footer>
+      <p>2.s009 Green Team B Sketch Model Review</p>
+    </footer>
+    <script>
+      window.addEventListener("DOMContentLoaded", () => {
+        const button = document.getElementById("button");
+        const result = document.getElementById("result");
+        const main = document.getElementsByTagName("main")[0];
+        let listening = false;
+        const SpeechRecognition = //check if the browser supports the SpeechReg or webkit object
+          window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (typeof SpeechRecognition !== "undefined") {
+          const recognition = new SpeechRecognition();
+
+          const stop = () => {
+            main.classList.remove("speaking");
+            recognition.stop();
+            button.textContent = "Start listening";
+          };
+
+          const start = () => { //change the button text 
+            main.classList.add("speaking");
+            recognition.start(); //animation of background 
+            button.textContent = "Stop listening";
+          };
+
+          const onResult = event => {
+            result.innerHTML = "";
+            for (const res of event.results) {
+              const text = document.createTextNode(res[0].transcript);
+              const p = document.createElement("p");
+              if (res.isFinal) {
+                // test if final word same as user FIX HERE
+                var user_name = "Emily";
+                var test_word = res[0].transcript;
+                //var result = user_name.localeCompare(test_word);
+                console.log(test_word);
+                //if (res[0].transcript === "Emily"){ //if key word is said i want to turn screen red
+                console.log(typeof res[0].transcript)
+                //document.main.background-color("red"); not correct --> will probably need an event listener for this 
+                p.classList.add("final");
+              }
+              p.appendChild(text);
+              result.appendChild(p);
+            }
+          };
+          recognition.continuous = true;
+          recognition.interimResults = true;
+          recognition.addEventListener("result", onResult);
+          button.addEventListener("click", event => {
+            listening ? stop() : start();
+            listening = !listening;
+          });
+        } else {
+          button.remove();
+          const message = document.getElementById("message");
+          message.removeAttribute("hidden");
+          message.setAttribute("aria-hidden", "false");
+        }
+      });
+    </script>
+  </body>
+</html>
